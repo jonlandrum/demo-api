@@ -1,5 +1,7 @@
 package com.jonlandrum.api.account;
 
+import com.jonlandrum.api.repo.Repo;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -18,8 +20,6 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long account_id;
-    public Long getAccount_id() { return account_id; }
-    public void setAccount_id(final Long account_id) { this.account_id = account_id; }
 
     /**
      * The username for this {@link Account}
@@ -100,6 +100,13 @@ public class Account {
     private LocalDateTime updated;
     public LocalDateTime getUpdated() { return updated; }
     public void setUpdated(final LocalDateTime updated) { this.updated = updated; }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "account", referencedColumnName = "account_id")
+    @OrderColumn
+    private Repo[] repos;
+    public Repo[] getRepos() { return repos; }
+    public void setRepos(final Repo[] repos) { this.repos = repos; }
 
     /**
      * Populated if the user login does not exist at GitHub

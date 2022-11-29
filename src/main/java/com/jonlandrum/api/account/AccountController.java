@@ -1,7 +1,9 @@
 package com.jonlandrum.api.account;
 
+import com.jonlandrum.api.repo.Repo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,6 +11,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class AccountController {
@@ -21,24 +26,25 @@ public class AccountController {
         this.repository = repository;
     }
 
-    @GetMapping("/{username}")
-    public Account getAccount(@PathVariable final String username) {
+    @GetMapping("/{login}")
+    public EntityModel<Account> getAccount(@PathVariable final String login) {
         Account account;
-        var potentialAccount = repository.findByLogin(username);
+        var potentialAccount = repository.findByLogin(login);
         if(potentialAccount.isPresent()) {
             account = potentialAccount.get();
             if (shouldUpdate(account)) {
                 updateAccount(account);
             }
         } else {
-            if(userExists(username)) {
+            if(userExists(login)) {
                 account = new Account();
-                account.setLogin(username);
+                account.setLogin(login);
                 account = updateAccount(account);
             } else
-                throw new AccountNotFoundException(username);
+                throw new AccountNotFoundException(login);
         }
-        return account;
+        return EntityModel.of(account,
+                linkTo(methodOn(AccountController.class).getAccount(login)).withSelfRel());
     }
 
     /**
@@ -48,8 +54,8 @@ public class AccountController {
      */
     private boolean userExists(final String username) {
         var accountEndpoint = "https://api.github.com/users/" + username;
-        var accountResponse = context.getBean(RestTemplate.class)
-                .getForObject(accountEndpoint, Account.class);
+        var restTemplate = new RestTemplate();
+        var accountResponse = restTemplate.getForObject(accountEndpoint, Account.class);
         return (accountResponse != null && accountResponse.getMessage() == null);
     }
 
@@ -71,8 +77,10 @@ public class AccountController {
     private Account updateAccount(final Account account) {
         var accountEndpoint = "https://api.github.com/users/" + account.getLogin();
         var reposEndpoint = accountEndpoint + "/repos";
-        var accountResponse = context.getBean(RestTemplate.class)
-                                              .getForObject(accountEndpoint, Account.class);
+        var restTemplate = new RestTemplate();
+        var accountResponse = restTemplate.getForObject(accountEndpoint, Account.class);
+        var reposResponse = restTemplate.getForEntity(reposEndpoint, Repo[].class);
+        var repos = reposResponse.getBody();
 
         return repository.findByLogin(account.getLogin())
                 .map(acct -> {
@@ -85,12 +93,14 @@ public class AccountController {
                         accountResponse.setUrl(account.getUrl());
                         accountResponse.setCreated_at(account.getCreated_at());
                         accountResponse.setUpdated(LocalDateTime.now());
+                        accountResponse.setRepos(repos);
                         return repository.save(accountResponse);
                     } else
                         return account;
                 }).orElseGet(() -> {
                     if (accountResponse != null) {
                         accountResponse.setLogin(account.getLogin());
+                        accountResponse.setRepos(repos);
                         return repository.save(accountResponse);
                     } else
                         return account;
