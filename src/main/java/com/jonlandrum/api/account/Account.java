@@ -1,54 +1,110 @@
 package com.jonlandrum.api.account;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
+/**
+ * Represents a single row of the {@link Account} table
+ */
 @Entity
 public class Account {
+    /**
+     * Unique ID for this {@link Account}
+     * <p>
+     *     This had to be named something other than "id" since that field exists in
+     *     the GitHub response object, and would overwrite the value in the system.
+     * </p>
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    public Long getId() { return id; }
-    public void setId(final Long id) { this.id = id; }
+    private Long account_id;
+    public Long getAccount_id() { return account_id; }
+    public void setAccount_id(final Long account_id) { this.account_id = account_id; }
 
-    // Key in JSON response: "login"
-    private String userName;
-    public String getUserName() { return userName; }
-    public void setUserName(final String userName) { this.userName = userName; }
+    /**
+     * The username for this {@link Account}
+     * <p>
+     *     Key in JSON response: "login"
+     * </p>
+     */
+    private String login;
+    public String getLogin() { return login; }
+    public void setLogin(final String login) { this.login = login; }
 
-    // Key in JSON response: "name"
-    private String displayName;
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(final String displayName) { this.displayName = displayName; }
+    /**
+     * The display name for this {@link Account}
+     * <p>
+     *     Key in JSON response: "name"
+     * </p>
+     */
+    private String name;
+    public String getName() { return name; }
+    public void setName(final String name) { this.name = name; }
 
-    // Key in JSON response: "avatar_url"
-    private String avatar;
-    public String getAvatar() { return avatar; }
-    public void setAvatar(final String avatar) { this.avatar = avatar; }
+    /**
+     * The URL of the avatar for this {@link Account}
+     * <p>
+     *     Key in JSON response: "avatar_url"
+     * </p>
+     */
+    private String avatar_url;
+    public String getAvatar_url() { return avatar_url; }
+    public void setAvatar_url(final String avatar_url) { this.avatar_url = avatar_url; }
 
-    // Key in JSON response: "location"
-    private String geoLocation;
-    public String getGeoLocation() { return geoLocation; }
-    public void setGeoLocation(final String geoLocation) { this.geoLocation = geoLocation; }
+    /**
+     * The geolocation for this {@link Account}
+     * <p>
+     *     Key in JSON response: "location"
+     * </p>
+     */
+    private String location;
+    public String getLocation() { return location; }
+    public void setLocation(final String location) { this.location = location; }
 
-    // Key in JSON response: "email"
+    /**
+     * The email address for this {@link Account}
+     * <p>
+     *     Key in JSON response: "email"
+     * </p>
+     */
     private String email;
     public String getEmail() { return email; }
     public void setEmail(final String email) { this.email = email; }
 
-    // Key in JSON response: "url"
+    /**
+     * The URL to the profile page for this {@link Account}
+     * <p>
+     *     Key in JSON response: "url"
+     * </p>
+     */
     private String url;
     public String getUrl() { return url; }
     public void setUrl(final String url) { this.url = url; }
 
-    // Key in JSON response: "created_at"
-    private String createdAt;
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(final String createdAt) { this.createdAt = createdAt; }
+    /**
+     * When the GitHub profile was created for this {@link Account}
+     * <p>
+     *     Key in JSON response: "created_at"
+     * </p>
+     */
+    private String created_at;
+    public String getCreated_at() { return created_at; }
+    public void setCreated_at(final String created_at) { this.created_at = created_at; }
 
-    // The last time this User was updated
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
-    public Date getUpdated() { return updated; }
-    public void setUpdated(final Date updated) { this.updated = updated; }
+    /**
+     * The last time this user was updated in the system
+     * <p>
+     *     Will determine if the remote APIs should be queried again before returning results.
+     * </p>
+     */
+    private LocalDateTime updated;
+    public LocalDateTime getUpdated() { return updated; }
+    public void setUpdated(final LocalDateTime updated) { this.updated = updated; }
+
+    /**
+     * Populated if the user login does not exist at GitHub
+     */
+    private String message;
+    public String getMessage() { return message; }
+    public void setMessage(final String message) { this.message = message; }
 }
