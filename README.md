@@ -16,16 +16,16 @@ Running The Code
 * Open the project in IntelliJ IDEA, Eclipse, or your Java IDE of choice
 * Click the "Run" button in the IDE interface to start the webserver
 
-The site data can be accessed through a web browser or with an API testing application such as Postman by accessing the address `localhost:8080/<username>`.
+The site data can be accessed through a web browser or with an API testing application such as Postman by accessing the address `localhost:8080/username`.
 
 Details about the API
 ---------------------
 
 The data used in this example are provided by GitHub:
-* https://api.github.com/users/<username>
-* https://api.github.com/users/<username>/repos
+* https://api.github.com/users/username
+* https://api.github.com/users/username/repos
 
-Any account can be polled via these APIs if the username is known. This same username is all that is required to utilize this API, so in the address for the API, the placeholder `<username>` should be replaced with a GitHub username, such as the "octocat" demo account:
+Any account can be polled via these APIs if the username is known. This same username is all that is required to utilize this API, so in the address for the API, the placeholder `username` should be replaced with a GitHub username, such as the "octocat" demo account:
 ```
 localhost:8080/octocat
 ```
@@ -44,19 +44,19 @@ The data provided by these two APIs are aggregated and the following information
 An example JSON object returned for the account "octocat" would be:
 ```json
 {
-  user_name: "octocat",
-  display_name: "The Octocat" ,
-  avatar: "https://avatars3.githubusercontent.com/u/583231?v=4 ",
-  geo_location: "San Francisco",
-  email: null,
-  url: "https://github.com/octocat ",
-  created_at: "2011-01-25 18:44:36",
-  repos: [
-    {
-      name: "boysenberry-repo-1" ,
-      url: "https://github.com/octocat/boysenberry-repo-1 "
-    }, ...
-  ]
+    user_name: "octocat",
+    display_name: "The Octocat" ,
+    avatar: "https://avatars3.githubusercontent.com/u/583231?v=4 ",
+    geo_location: "San Francisco",
+    email: null,
+    url: "https://github.com/octocat ",
+    created_at: "2011-01-25 18:44:36",
+    repos: [
+        {
+            name: "boysenberry-repo-1" ,
+            url: "https://github.com/octocat/boysenberry-repo-1 "
+        }, ...
+    ]
 }
 ```
 If there is no account found for the given input data, an empty JSON object is returned: `{}`.
